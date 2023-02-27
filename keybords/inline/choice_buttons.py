@@ -26,3 +26,10 @@ help_keyboard = InlineKeyboardMarkup(
     ]
 )
 
+main_menu_keyboard = InlineKeyboardMarkup(
+    inline_keyboard = [
+        [
+            InlineKeyboardButton(text='Главное меню', callback_data=key.main_menu_callback.new(item_main_menu='main')),
+        ],
+    ]
+)

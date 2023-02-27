@@ -26,6 +26,7 @@ async def db_start():
         ''')
     db.commit()
 
+# Добавляет вновь прибывших сотрудников
 async def create_profile(user_id, username):
     user = cur.execute("SELECT 1 FROM employees WHERE user_id == '{key}'".format(key=user_id)).fetchone()
     
@@ -70,11 +71,27 @@ async def up_actual(id):
 # Осуществляем выбурку из всей таблицы тендеры
 async def all_tender():
     with sq.connect('TENDERS.db') as con:
+        cur = con.cursor()
         cur.execute('SELECT * FROM neftehgim_tender')
         return cur.fetchall()
 
 # Осуществляем выбурку из всей таблицы тендеры по типу работы
 async def tender_9():
     with sq.connect('TENDERS.db') as con:
+        cur = con.cursor()
         cur.execute('SELECT * FROM neftehgim_tender WHERE id_tenderSubject = 9')
+        return cur.fetchall()
+
+# Меняет статус на рассылке сотрудников
+async def get_mailing(id, status):
+    with sq.connect('TENDERS.db') as con:
+        cur = con.cursor()
+        cur.execute(f'UPDATE employees SET newsletter = {status} WHERE user_id = {id}')
+        return cur.fetchall()
+
+# Посмотреть статус рассылки
+async def mailing_status(id):
+    with sq.connect('TENDERS.db') as con:
+        cur = con.cursor()
+        cur.execute('SELECT newsletter FROM employees WHERE user_id = ' + id)
         return cur.fetchall()
