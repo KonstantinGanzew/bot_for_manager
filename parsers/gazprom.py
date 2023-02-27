@@ -1,6 +1,6 @@
 import requests
 import math
-import sql as sq
+import bd.sql as sq
 
 HOST = 'https://salavat-neftekhim.gazprom.ru'
 URL = 'https://salavat-neftekhim.gazprom.ru/IMP-tenders?p=0&type=active&is_days_homepage=true'

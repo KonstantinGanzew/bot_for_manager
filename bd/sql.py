@@ -1,8 +1,7 @@
 import sqlite3 as sq
 
 # Создание бд
-
-def db_start():
+async def db_start():
     global db, cur
     db = sq.connect('TENDERS.db')
     cur = db.cursor()
@@ -20,18 +19,22 @@ def db_start():
         tenderSubject TEXT,
         published INTEGER DEFAULT 1,
         actual INTEGER DEFAULT 1)''')
+    cur.execute('''CREATE TABLE IF NOT EXISTS employees(
+        user_id INTEGER PRIMARY KEY,
+        name TEXT,
+        newsletter INTEGER)
+        ''')
     db.commit()
 
 async def create_profile(user_id, username):
-    user = cur.execute("SELECT 1 FROM profile WHERE user_id == '{key}'".format(key=user_id)).fetchone()
+    user = cur.execute("SELECT 1 FROM employees WHERE user_id == '{key}'".format(key=user_id)).fetchone()
     
     if not user:
-        cur.execute('INSERT INTO profile VALUES(?, ?, ?)', (user_id, username, 0))
+        cur.execute('INSERT INTO employees VALUES(?, ?, ?)', (user_id, username, 1))
         db.commit()
 
 # Добавляем элемент в базу
-
-def add_tend(id, name, description, link, dateStart, dateEnd, id_tenderSubject, tenderSubject, published = 1, actual = 1):
+async def add_tend(id, name, description, link, dateStart, dateEnd, id_tenderSubject, tenderSubject, published = 1, actual = 1):
     application = cur.execute("SELECT 1 FROM neftehgim_tender WHERE id == '{key}'".format(key=id)).fetchone()
     if not application:
         cur.execute('INSERT INTO neftehgim_tender VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
@@ -40,8 +43,7 @@ def add_tend(id, name, description, link, dateStart, dateEnd, id_tenderSubject, 
         db.commit()
 
 # Проверяем наличие не опубликованых тендоров из базы
-
-def sel_published():
+async def sel_published():
     with sq.connect('TENDERS.db') as con:
         cur = con.cursor()
 
@@ -50,8 +52,7 @@ def sel_published():
         return cur.fetchall()
 
 # Обнавляем полe публикации
-
-def up_published(id):
+async def up_published(id):
     with sq.connect('TENDERS.db') as con:
         cur = con.cursor()
 
@@ -59,11 +60,21 @@ def up_published(id):
         return cur.fetchall()
 
 # Обнавляем полe актальности
-
-def up_actual(id):
+async def up_actual(id):
     with sq.connect('TENDERS.db') as con:
         cur = con.cursor()
 
         cur.execute(f'UPDATE neftehgim_tender SET actual = 2 WHERE id={id}')
         return cur.fetchall()
-    
+
+# Осуществляем выбурку из всей таблицы тендеры
+async def all_tender():
+    with sq.connect('TENDERS.db') as con:
+        cur.execute('SELECT * FROM neftehgim_tender')
+        return cur.fetchall()
+
+# Осуществляем выбурку из всей таблицы тендеры по типу работы
+async def tender_9():
+    with sq.connect('TENDERS.db') as con:
+        cur.execute('SELECT * FROM neftehgim_tender WHERE id_tenderSubject = 9')
+        return cur.fetchall()

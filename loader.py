@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler import CancelHandler
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from sql import db_start
+from bd.sql import db_start
 
 class AuthMiddleware(BaseMiddleware):
 

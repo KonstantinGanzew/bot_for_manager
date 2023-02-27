@@ -1,4 +1,5 @@
-from loader import bot, db_start
+from loader import bot, db_start, AuthMiddleware
+
 
 async def on_shutdown(dp):
     await bot.close()
