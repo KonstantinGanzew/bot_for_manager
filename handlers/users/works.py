@@ -2,10 +2,12 @@ import logging
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery
 from loader import dp, bot
-import erp
+import aioschedule
+import asyncio
 import keybords.inline.choice_buttons as key
 import keybords.inline.callback_datas as call_datas
 from bd.sql import *
+from parsers.gazprom import *
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Кнопка старт, аутентифицирует человека, отправляет клавиатуру
@@ -99,7 +101,28 @@ async def main_menu(call: CallbackQuery, callback_data: dict):
     await call.answer()
 
 @dp.callback_query_handler(call_datas.main_menu_callback.filter(item_main_menu='main'))
-async def main_menu(call: CallbackQuery, callback_data: dict):
+async def main_menus(call: CallbackQuery, callback_data: dict):
     logging.info(f'call + {callback_data}')
     await call.message.edit_text('Добро пожаловать\n\nЭто бот для просмотра всех активных тендеров.', reply_markup=key.menu_keyboard)
     await call.answer()
+
+async def alerts():
+    tend = await sel_published()
+    if tend != []:
+        manag = await mailing_empl()
+        for item in tend:
+            text = f'Имя: {item[1]}\nОписание: {item[2]}\nСсылка: {item[3]}\nНачал: {item[4]}\nКонец: {item[5]}\nТип тендера: {item[7]}'
+            for id in manag:
+                await bot.send_message(id, text)
+            up_published(item[0])
+
+# Хадули
+async def scheduler():
+    try:
+        aioschedule.every(10).minutes.do(parsing_to_sql())
+        aioschedule.every(11).minutes.do(alerts())
+        while True:
+            await aioschedule.run_pending()
+            await asyncio.sleep(1)
+    except:
+        await asyncio.sleep(30)

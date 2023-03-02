@@ -48,8 +48,7 @@ async def sel_published():
     with sq.connect('TENDERS.db') as con:
         cur = con.cursor()
 
-        cur.execute('''SELECT * FROM neftehgim_tender 
-                    WHERE published = 2''')
+        cur.execute('''SELECT * FROM neftehgim_tender WHERE published = 1''')
         return cur.fetchall()
 
 # Обнавляем полe публикации
@@ -94,4 +93,11 @@ async def mailing_status(id):
     with sq.connect('TENDERS.db') as con:
         cur = con.cursor()
         cur.execute('SELECT newsletter FROM employees WHERE user_id = ' + id)
+        return cur.fetchall()
+
+# Посмотреть статус рассылки
+async def mailing_empl():
+    with sq.connect('TENDERS.db') as con:
+        cur = con.cursor()
+        cur.execute('SELECT user_id FROM employees WHERE newsletter = 2')
         return cur.fetchall()
